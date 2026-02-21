@@ -3,3 +3,9 @@ transformers>=4.40.0
 triton>=2.2.0
 ninja
 accelerate
+fastapi>=0.115.0
+uvicorn>=0.30.0
+websockets>=12.0
+numpy>=1.26.0
+pipecat-ai>=0.0.77
+deepgram-sdk>=3.7.0

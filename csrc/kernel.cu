@@ -71,7 +71,10 @@ constexpr int LDG_NUM_WARPS = LDG_BLOCK_SIZE / WARP_SIZE;
 constexpr float LDG_RMS_EPS = 1e-6f;
 
 // LM head
-constexpr int LDG_VOCAB_SIZE = 151936;
+#ifndef LDG_VOCAB_SIZE
+#define LDG_VOCAB_SIZE 151936
+#endif
+constexpr int LDG_VOCAB_SIZE_CONST = LDG_VOCAB_SIZE;
 
 struct LDGLayerWeights {
   const __nv_bfloat16 *input_layernorm_weight;
@@ -878,9 +881,9 @@ __global__ void ldg_lm_head_phase1(const float *__restrict__ hidden,
   int warp_id = threadIdx.x / WARP_SIZE;
   int lane_id = threadIdx.x % WARP_SIZE;
 
-  int rows_per_block = (LDG_VOCAB_SIZE + gridDim.x - 1) / gridDim.x;
+  int rows_per_block = (LDG_VOCAB_SIZE_CONST + gridDim.x - 1) / gridDim.x;
   int row_start = blockIdx.x * rows_per_block;
-  int row_end = min(row_start + rows_per_block, LDG_VOCAB_SIZE);
+  int row_end = min(row_start + rows_per_block, LDG_VOCAB_SIZE_CONST);
 
   float local_max = -INFINITY;
   int local_max_idx = -1;
@@ -1034,9 +1037,9 @@ __global__ void ldg_lm_head_fused(const float *__restrict__ hidden,
   int warp_id = threadIdx.x / WARP_SIZE;
   int lane_id = threadIdx.x % WARP_SIZE;
 
-  int rows_per_block = (LDG_VOCAB_SIZE + gridDim.x - 1) / gridDim.x;
+  int rows_per_block = (LDG_VOCAB_SIZE_CONST + gridDim.x - 1) / gridDim.x;
   int row_start = blockIdx.x * rows_per_block;
-  int row_end = min(row_start + rows_per_block, LDG_VOCAB_SIZE);
+  int row_end = min(row_start + rows_per_block, LDG_VOCAB_SIZE_CONST);
 
   float local_max = -INFINITY;
   int local_max_idx = -1;
